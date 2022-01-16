@@ -95,7 +95,7 @@ fn parse(tokens: Vec<Token>) -> Vec<Instruction> {
     }
     program
 }
-fn run(instructions: &Vec<Instruction>, tape: &mut Vec<u8>, data_pointer: &mut usize) {
+fn run(instructions: &Vec<Instruction>, tape: &mut Vec<u16>, data_pointer: &mut usize) {
     for instr in instructions{
         match instr {
             Instruction::IncPointer => *data_pointer += 1,
@@ -107,11 +107,11 @@ fn run(instructions: &Vec<Instruction>, tape: &mut Vec<u8>, data_pointer: &mut u
             &Instruction::Read => {
                 let mut input: [u8; 1] = [0; 1];
                 std::io::stdin().read_exact(&mut input).expect("read one char failed");
-                tape[*data_pointer] = input[0];
+                tape[*data_pointer] = input[0] as u16;
             },
 
             Instruction::Write => {
-                print!("{}", tape[*data_pointer] as char);
+                print!("{}", tape[*data_pointer] as u8 as char);
             },
             
             Instruction::Loop(nest_instructions) => {
@@ -119,7 +119,6 @@ fn run(instructions: &Vec<Instruction>, tape: &mut Vec<u8>, data_pointer: &mut u
                     run(&nest_instructions, tape, data_pointer);
                 }
             }
-
         }
     }
 }
@@ -142,7 +141,7 @@ fn main() {
         println!("{:?}", program);
 
         // run
-        let mut tape: Vec<u8> = vec![0; 1024];
+        let mut tape: Vec<u16> = vec![0; 1024];
         let mut data_pointer = 512;
         run(&program, &mut tape, &mut data_pointer);
     } else {
